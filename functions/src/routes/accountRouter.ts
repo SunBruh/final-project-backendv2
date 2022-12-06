@@ -41,7 +41,7 @@ accountRouter.get("/:uid", async (req, res) => {
   }
 });
 
-// add whishlist function
+// add wishlist/shelf function
 accountRouter.put("/:uid", async (req, res) => {
   console.log("test");
 
