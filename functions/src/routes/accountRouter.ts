@@ -1,4 +1,5 @@
 import express from "express";
+import { ObjectId } from "mongodb";
 import { getClient } from "../db";
 import Account from "../models/Account";
 import BoardGame from "../models/BoardGame";
@@ -41,8 +42,28 @@ accountRouter.get("/:uid", async (req, res) => {
 });
 
 // add whishlist function
-accountRouter.put("/", async (req, res) => {
-  // const id: string = req.params.id;
+accountRouter.put("/:uid", async (req, res) => {
+  console.log("test");
+
+  const uid = req.params.uid;
+  const updatedAccount: Account = req.body;
+  const id = updatedAccount._id;
+  delete updatedAccount._id;
+  try {
+    const client = await getClient();
+    const result = await client
+      .db()
+      .collection<Account>("accounts")
+      .replaceOne({ uid }, updatedAccount);
+    if (result.matchedCount > 0) {
+      updatedAccount._id = new ObjectId(id);
+      res.status(200).json(updatedAccount);
+    } else {
+      res.status(404).json({ message: "account not found" });
+    }
+  } catch (err) {
+    errorResponse(err, res);
+  }
 });
 
 // make account
