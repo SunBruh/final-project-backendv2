@@ -25,6 +25,21 @@ reviewRouter.get("/:id", async (req, res) => {
   }
 });
 
+reviewRouter.get("/reviewPage/:id", async (req, res) => {
+  const id = req.params.id;
+  try {
+    const client = await getClient();
+    const result = await client
+      .db()
+      .collection<Review>("reviews")
+      .find({ reviewerId: id })
+      .toArray();
+    res.status(200).json(result);
+  } catch (err) {
+    errorResponse(err, res);
+  }
+});
+
 // create a review
 reviewRouter.post("/", async (req, res) => {
   const newReview: Review = req.body;
