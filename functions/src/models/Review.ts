@@ -1,4 +1,5 @@
 import { ObjectId } from "mongodb";
+import Account from "./Account";
 
 export default interface Review {
   _id?: ObjectId;
@@ -6,4 +7,5 @@ export default interface Review {
   title: string;
   content: string;
   comments?: string[];
+  reviewAccount: Account;
 }
