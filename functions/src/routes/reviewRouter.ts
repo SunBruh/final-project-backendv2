@@ -1,4 +1,4 @@
-import { ObjectId, ObjectID } from "bson";
+import { ObjectId } from "bson";
 import express from "express";
 import { getClient } from "../db";
 import Review from "../models/Review";
@@ -53,16 +53,16 @@ reviewRouter.post("/", async (req, res) => {
   }
 });
 
-reviewRouter.put("/", async (req, res) => {
+reviewRouter.put("/:id", async (req, res) => {
   const updatedReview: Review = req.body;
-  const id = updatedReview._id;
+  const id = req.params.id;
   delete updatedReview._id;
   try {
     const client = await getClient();
     const result = await client
       .db()
       .collection<Review>("reviews")
-      .replaceOne({ _id: id }, updatedReview);
+      .replaceOne({ _id: new ObjectId(id) }, updatedReview);
     if (result.matchedCount) {
       updatedReview._id = new ObjectId(id);
       res.status(200).json(updatedReview);
