@@ -23,6 +23,7 @@ accountRouter.get("/", async (req, res) => {
   }
 });
 
+// pull up someone's account
 accountRouter.get("/account/:uid", async (req, res) => {
   const uid = req.params.uid;
   try {
@@ -31,6 +32,26 @@ accountRouter.get("/account/:uid", async (req, res) => {
       .db()
       .collection<Account>("accounts")
       .findOne({ uid });
+    if (result) {
+      res.status(200).json(result);
+    } else {
+      res.status(404).json({ message: "account not found" });
+    }
+  } catch (err) {
+    errorResponse(err, res);
+  }
+});
+
+// search for accounts by name
+accountRouter.get("/search/:displayName", async (req, res) => {
+  const displayName = req.params.displayName;
+  try {
+    const client = await getClient();
+    const result = await client
+      .db()
+      .collection<Account>("accounts")
+      .find({ name: new RegExp(displayName, "i") })
+      .toArray();
     if (result) {
       res.status(200).json(result);
     } else {
@@ -73,25 +94,6 @@ accountRouter.post("/", async (req, res) => {
     const client = await getClient();
     await client.db().collection<Account>("accounts").insertOne(newAccount);
     res.status(201).json(newAccount);
-  } catch (err) {
-    errorResponse(err, res);
-  }
-});
-
-accountRouter.get("/search/:displayName", async (req, res) => {
-  const displayName = req.params.displayName;
-  try {
-    const client = await getClient();
-    const result = await client
-      .db()
-      .collection<Account>("accounts")
-      .find({ name: new RegExp(displayName, "i") })
-      .toArray();
-    if (result) {
-      res.status(200).json(result);
-    } else {
-      res.status(404).json({ message: "account not found" });
-    }
   } catch (err) {
     errorResponse(err, res);
   }
